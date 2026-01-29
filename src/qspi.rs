@@ -14,7 +14,7 @@ use crate::{
 };
 
 cfg_if! {
-    if #[cfg(any(feature = "l5", feature = "h735", feature = "h7b3"))] {
+    if #[cfg(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3"))] {
         use crate::pac::OCTOSPI1 as QUADSPI;
     } else if #[cfg(feature = "h5")] {
         use crate::pac::OCTOSPI as QUADSPI;
@@ -183,7 +183,7 @@ impl Qspi {
         // todo: You need to get rcc en reset working for this to make it work on octospi2.
 
         cfg_if! {
-            if #[cfg(any(feature = "h735", feature = "h7b3"))] {
+            if #[cfg(any(feature = "h7_2or3_x", feature = "h7b3"))] {
                 rcc.ahb3enr().modify(|_, w| w.octospi1en().bit(true));
                 rcc.ahb3rstr().modify(|_, w| w.octospi1rst().bit(true));
                 rcc.ahb3rstr().modify(|_, w| w.octospi1rst().clear_bit());
@@ -216,10 +216,10 @@ impl Qspi {
             w.admode().bits(cfg.protocol_mode as u8);
             w.imode().bits(cfg.protocol_mode as u8);
             w.dmode().bits(cfg.protocol_mode as u8);
-            #[cfg(not(any(feature = "l5", feature = "h735", feature = "h7b3")))]
+            #[cfg(not(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3")))]
             // todo: Equiv for octo?
             w.ddrm().bit(cfg.data_mode as u8 != 0);
-            #[cfg(not(any(feature = "l5", feature = "h735", feature = "h7b3")))]
+            #[cfg(not(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3")))]
             // todo: Equiv for octo?
             w.dcyc().bits(cfg.dummy_cycles);
             w.adsize().bits(cfg.address_size as u8)
@@ -230,7 +230,7 @@ impl Qspi {
         // The addressable space in memory-mapped mode is limited to 256MB.
         //
         let fsize = (cfg.mem_size * 1_000_000).ilog2() - 1;
-        #[cfg(not(any(feature = "l5", feature = "h735", feature = "h7b3")))]
+        #[cfg(not(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3")))]
         regs.dcr()
             .modify(|_, w| unsafe { w.fsize().bits(fsize as u8) });
 
@@ -254,7 +254,7 @@ impl Qspi {
             DataMode::Ddr => SamplingEdge::Rising,
         };
 
-        #[cfg(not(any(feature = "l5", feature = "h735", feature = "h7b3")))]
+        #[cfg(not(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3")))]
         // todo: Equiv for octo?
         regs.cr().write(|w| unsafe {
             w.prescaler().bits(cfg.clock_division as u8 - 1);
@@ -328,7 +328,7 @@ impl Qspi {
         // and DMAEN = 1, then QUADSPI_AR should be specified before QUADSPI_CR,
         // because otherwise QUADSPI_DR might be written by the DMA before QUADSPI_AR
         // is updated (if the DMA controller has already been enabled)
-        #[cfg(not(any(feature = "l5", feature = "h735", feature = "h7b3")))]
+        #[cfg(not(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3")))]
         // todo: Equiv for octo?
         self.regs
             .ccr()
@@ -396,7 +396,7 @@ impl Qspi {
         self.regs
             .dlr()
             .write(|w| unsafe { w.dl().bits(buf.len() as u32 - 1) });
-        #[cfg(not(any(feature = "l5", feature = "h735", feature = "h7b3")))]
+        #[cfg(not(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3")))]
         // todo: Equiv for octo?
         self.regs
             .ccr()
@@ -429,7 +429,7 @@ impl Qspi {
         // todo: unsafe fn? word size?
         bounded_loop!(self.is_busy(), Error::RegisterUnchanged);
 
-        #[cfg(not(any(feature = "l5", feature = "h735", feature = "h7b3")))]
+        #[cfg(not(any(feature = "l5", feature = "h7_2or3_x", feature = "h7b3")))]
         // todo: Equiv for octo?
         if self.regs.ccr().read().fmode().bits() != FunctionalMode::MemoryMapped as u8 {
             self.regs

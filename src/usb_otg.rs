@@ -32,7 +32,7 @@ cfg_if! {
         // can be a bit confusing. This refers to the USB periphral on pins PA11 and PA12
         // for those MCUs. On newer ones like H723, use OTG1, which in that case, still
         // maps to PA11 and PA12.
-            if #[cfg(not(any(feature = "h735", feature = "h7b3")))] {
+            if #[cfg(not(any(feature = "h7_2or3_x", feature = "h7b3")))] {
                 type Usb2RegGlobalType = pac::OTG2_HS_GLOBAL;
                 type Usb2RegDeviceType = pac::OTG2_HS_DEVICE;
                 type Usb2RegPwrclkType = pac::OTG2_HS_PWRCLK;
@@ -70,7 +70,7 @@ impl Usb1 {
 }
 
 cfg_if! {
-    if #[cfg(all(feature = "h7", not(any(feature = "h735", feature = "h7b3"))))] {
+    if #[cfg(all(feature = "h7", not(any(feature = "h7_2or3_x", feature = "h7b3"))))] {
         pub struct Usb2 {
             pub usb_global: Usb2RegGlobalType,
             pub usb_device: Usb2RegDeviceType,
@@ -157,7 +157,7 @@ cfg_if! {
 pub type Usb1BusType = UsbBus<Usb1>;
 
 cfg_if! {
-if #[cfg(all(feature = "h7", not(any(feature = "h735", feature = "h7b3"))))] {
+if #[cfg(all(feature = "h7", not(any(feature = "h7_2or3_x", feature = "h7b3"))))] {
     usb_peripheral! {
         Usb2, Usb2RegGlobalType, ahb1enr, ahb1rstr, usb2otgen, usb2otgrst
     }

@@ -38,7 +38,7 @@ pub enum Bank {
 
 // todo: Bank 2 support on H7 and others.
 
-#[cfg(any(feature = "h735", not(feature = "h7")))]
+#[cfg(any(feature = "h73x", not(feature = "h7")))]
 /// Check and clear all non-secure error programming flags due to a previous
 /// programming. If not, PGSERR is set.
 fn clear_error_flags(regs: &FLASH) {
@@ -72,15 +72,15 @@ fn clear_error_flags(regs: &FLASH) {
                 regs.sr().modify(|_, w| w.operr().bit(true));
             }
         } else {
-            #[cfg(not(feature = "h735"))]
+            #[cfg(not(feature = "h73x"))]
             if sr.optverr().bit_is_set() {
                 regs.sr().write(|w| w.optverr().bit(true));
             }
-            #[cfg(not(any(feature = "h735", feature = "g0", feature = "g4", feature = "wl", feature = "wb", feature = "l4", feature = "c0")))]
+            #[cfg(not(any(feature = "h73x", feature = "g0", feature = "g4", feature = "wl", feature = "wb", feature = "l4", feature = "c0")))]
             if sr.rderr().bit_is_set() {
                 regs.sr().write(|w| w.rderr().bit(true));
             }
-            #[cfg(not(any(feature = "h735", feature = "g0", feature = "g4", feature = "wl", feature = "wb", feature = "l4", feature = "c0")))]
+            #[cfg(not(any(feature = "h73x", feature = "g0", feature = "g4", feature = "wl", feature = "wb", feature = "l4", feature = "c0")))]
             if sr.rdperr().bit_is_set() {
                 regs.sr().write(|w| w.rdperr().bit(true));
             }
@@ -98,18 +98,18 @@ fn clear_error_flags(regs: &FLASH) {
             if sr.pgserr().bit_is_set() {
                 regs.sr().write(|w| w.pgserr().bit(true));
             }
-            #[cfg(not(feature = "h735"))]
+            #[cfg(not(feature = "h73x"))]
             if sr.sizerr().bit_is_set() {
                 regs.sr().write(|w| w.sizerr().bit(true));
             }
-            #[cfg(not(feature = "h735"))]
+            #[cfg(not(feature = "h73x"))]
             if sr.pgaerr().bit_is_set() {
                 regs.sr().write(|w| w.pgaerr().bit(true));
             }
             if sr.wrperr().bit_is_set() {
                 regs.sr().write(|w| w.wrperr().bit(true));
             }
-            #[cfg(not(feature = "h735"))]
+            #[cfg(not(feature = "h73x"))]
             if sr.progerr().bit_is_set() {
                 regs.sr().write(|w| w.progerr().bit(true));
             }
@@ -121,7 +121,7 @@ fn clear_error_flags(regs: &FLASH) {
     }
 }
 
-#[cfg(all(feature = "h7", not(feature = "h735")))]
+#[cfg(all(feature = "h7", not(feature = "h73x")))]
 /// Check and clear all non-secure error programming flags due to a previous
 /// programming. If not, PGSERR is set.
 fn clear_error_flags(regs: &BANK) {
@@ -165,9 +165,9 @@ impl Flash {
     pub fn unlock(&mut self) -> Result<()> {
         #[cfg(not(feature = "h7"))]
         let regs = &self.regs;
-        #[cfg(all(feature = "h7", not(feature = "h735")))]
+        #[cfg(all(feature = "h7", not(feature = "h73x")))]
         let regs = self.regs.bank1();
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h73x")]
         let regs = &self.regs;
 
         if regs.cr().read().lock().bit_is_clear() {
@@ -216,9 +216,9 @@ impl Flash {
 
         #[cfg(not(feature = "h7"))]
         let regs = &self.regs;
-        #[cfg(all(feature = "h7", not(feature = "h735")))]
+        #[cfg(all(feature = "h7", not(feature = "h73x")))]
         let regs = self.regs.bank1();
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h73x")]
         let regs = &self.regs;
 
         #[cfg(not(flash_bsy1))]
@@ -236,7 +236,7 @@ impl Flash {
         Ok(())
     }
 
-    #[cfg(any(feature = "h735", not(feature = "h7")))]
+    #[cfg(any(feature = "h73x", not(feature = "h7")))]
     #[allow(unused_variables)] // bank arg on single-bank MCUs.
     /// Erase an entire page. See L4 Reference manual, section 3.3.5.
     /// For why this is required, reference L4 RM, section 3.3.7:
@@ -359,7 +359,7 @@ impl Flash {
         Ok(())
     }
 
-    #[cfg(all(feature = "h7", not(feature = "h735")))]
+    #[cfg(all(feature = "h7", not(feature = "h73x")))]
     /// Erase a 128kb sector. See H743 RM, section 4.3.10: FLASH erase operations; subsection
     /// Flash sector erase sequence. Note that this is similar to the procedure for other
     /// families, but has a different name "sector" vice "page", and the RM instructions
@@ -409,14 +409,14 @@ impl Flash {
 
         #[cfg(not(feature = "h7"))]
         let regs = &self.regs;
-        #[cfg(all(feature = "h7", not(feature = "h735")))]
+        #[cfg(all(feature = "h7", not(feature = "h73x")))]
         let regs = &match bank {
             Bank::B1 => self.regs.bank1(),
             // todo: PAC bank 2 error
             #[cfg(not(any(feature = "h747cm4", feature = "h747cm7")))]
             Bank::B2 => self.regs.bank2(),
         };
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h73x")]
         let regs = &self.regs;
 
         // To perform a bank Mass Erase, follow the procedure below:

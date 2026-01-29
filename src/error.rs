@@ -4,7 +4,7 @@
 use crate::crc::PolynomialError;
 #[cfg(not(any(feature = "l552", feature = "h5", feature = "f4")))]
 use crate::dma::DmaError;
-#[cfg(not(feature = "h735"))]
+#[cfg(not(feature = "h7_2or3_x"))]
 use crate::flash::FlashError;
 #[cfg(not(any(
     feature = "f",
@@ -53,7 +53,7 @@ pub enum Error {
     UsartError(UsartError),
     TimerError(TimerError),
     ///
-    #[cfg(not(feature = "h735"))]
+    #[cfg(not(feature = "h7_2or3_x"))]
     FlashError(FlashError),
     #[cfg(not(any(feature = "f", feature = "wb", feature = "wl", feature = "h5")))]
     /// CRC
@@ -86,7 +86,7 @@ impl_from_error!(DmaError);
 impl_from_error!(I2cError);
 impl_from_error!(UsartError);
 impl_from_error!(TimerError);
-#[cfg(not(feature = "h735"))]
+#[cfg(not(feature = "h7_2or3_x"))]
 impl_from_error!(FlashError);
 #[cfg(not(any(feature = "f", feature = "wb", feature = "wl", feature = "h5")))]
 impl_from_error!(PolynomialError);

@@ -197,6 +197,9 @@
     feature = "h562",
     feature = "h563",
     feature = "h573",
+    feature = "h723",
+    feature = "h725",
+    feature = "h733",
     feature = "h735",
     feature = "h743",
     feature = "h743v",
@@ -318,6 +321,12 @@ pub use stm32h5::stm32h573 as pac;
 #[cfg(feature = "h7b3")]
 pub use stm32h7::stm32h7b3 as pac;
 // H7 PAC
+#[cfg(feature = "h723")]
+pub use stm32h7::stm32h723 as pac;
+#[cfg(feature = "h725")]
+pub use stm32h7::stm32h725 as pac;
+#[cfg(feature = "h733")]
+pub use stm32h7::stm32h733 as pac;
 #[cfg(feature = "h735")]
 pub use stm32h7::stm32h735 as pac;
 #[cfg(feature = "h743")]
@@ -412,7 +421,7 @@ pub use error::Error;
 pub mod ethernet;
 
 // todo: July 2025. Fix h735 flash, and put back. Mess of feature gate changes from 0.16 PAC.
-#[cfg(not(feature = "h735"))]
+#[cfg(not(feature = "h7_2or3_x"))]
 pub mod flash;
 
 // todo: PAC doesn't yet support these newer H7 MCUs that use FMAC.

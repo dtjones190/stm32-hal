@@ -483,7 +483,7 @@ macro_rules! hal {
                     // ...The software is allowed to write this bit only when ADSTART=0 and JADSTART=0 (which
                     // ensures that no conversion is ongoing)."
                     // todo: On H7, allow disabling boost, either manually, or by checking the clock speed.
-                    #[cfg(all(feature = "h7", not(any(feature = "h743", feature = "h753", feature = "h735"))))]
+                    #[cfg(all(feature = "h7", not(any(feature = "h743", feature = "h753", feature = "h7_2or3_x"))))]
                     adc.regs.cr().modify(|_, w| unsafe { w.boost().bits(1)});
 
                     #[cfg(any(feature = "h743", feature = "h753"))]
@@ -529,7 +529,7 @@ macro_rules! hal {
 
             /// Set the alignment mode.
             pub fn set_align(&self, align: Align) {
-                #[cfg(all(feature = "h7", not(feature = "h735")))]
+                #[cfg(all(feature = "h7", not(feature = "h7_2or3_x")))]
                 self.regs.cfgr2().modify(|_, w| unsafe { w.lshift().bits(align as u8)});
                 // todo: How to do on H735?
 
@@ -727,7 +727,7 @@ macro_rules! hal {
                         let val = self.regs.calfact().read().calfact_s().bits();
                         #[cfg(not(feature = "h7"))]
                         let val = val as u16;
-                        #[cfg(feature = "h735")]
+                        #[cfg(feature = "h7_2or3_x")]
                         let val = val as u16;
                         self.cfg.cal_single_ended = Some(val);
                     }
@@ -735,7 +735,7 @@ macro_rules! hal {
                          let val = self.regs.calfact().read().calfact_d().bits();
                          #[cfg(not(feature = "h7"))]
                          let val = val as u16;
-                         #[cfg(feature = "h735")]
+                         #[cfg(feature = "h7_2or3_x")]
                          let val = val as u16;
                          self.cfg.cal_differential = Some(val);
                     }
@@ -859,7 +859,7 @@ macro_rules! hal {
                     _ => panic!("Sequence out of bounds. Only 16 positions are available, starting at 1."),
                 };
 
-                #[cfg(all(feature = "h7", not(feature = "h735")))]
+                #[cfg(all(feature = "h7", not(feature = "h7_2or3_x")))]
                 self.regs.pcsel().modify(|r, w| unsafe { w.pcsel().bits(r.pcsel().bits() | (1 << chan)) });
 
                 // todo: Figure this out, and put back (July 2025/pack 0.16)
@@ -1075,7 +1075,7 @@ macro_rules! hal {
             /// Read data from a conversion. In OneShot mode, this will generally be run right
             /// after `start_conversion`.
             pub fn read_result(&mut self, ch: u8) -> u16 {
-                #[cfg(not(feature = "h735"))]
+                #[cfg(not(feature = "h7_2or3_x"))]
                 self.regs.pcsel().modify(|r, w| unsafe { w.pcsel().bits(r.pcsel().bits() & !(1 << ch)) });
 
                 // todo: Figure this out, and put back (July 2025/pack 0.16)
@@ -1164,7 +1164,7 @@ macro_rules! hal {
                     w.dmaen().bit(true)
                 });
 
-                #[cfg(all(feature = "h7", not(feature = "h735")))]
+                #[cfg(all(feature = "h7", not(feature = "h7_2or3_x")))]
                 self.regs.cfgr().modify(|_, w| {
                     // Note: To use non-DMA after this has been set, need to configure manually.
                     // ie set back to 0b00.

@@ -6,7 +6,7 @@
 
 use cfg_if::cfg_if;
 
-#[cfg(not(any(feature = "h5", feature = "h7b3", feature = "h735")))]
+#[cfg(not(any(feature = "h5", feature = "h7b3", feature = "h7_2or3_x")))]
 use crate::pac::SYSCFG;
 use crate::{
     clocks::RccError,
@@ -59,10 +59,10 @@ pub enum UsbSrc {
 #[repr(u8)]
 /// Select the SYNC signal source. Sets the CRS_CFGR register, SYNCSRC field.
 pub enum CrsSyncSrc {
-    #[cfg(feature = "h735")] // todo: 735 and 743 are opposites here. QC which use which.
+    #[cfg(feature = "h7_2or3_x")] // todo: 735 and 743 are opposites here. QC which use which.
     /// CRS_SYNC pin selected as SYNC signal source
     CrsSync = 0b00,
-    #[cfg(not(feature = "h735"))]
+    #[cfg(not(feature = "h7_2or3_x"))]
     /// USB2 SOF selected as SYNC signal source
     Usb2 = 0b00,
     /// LSE selected as SYNC signal source
@@ -317,7 +317,7 @@ impl VosRange {
     /// programming delay) (FLASH ACR_LATENCY, WRHIGHFREQ) values respectively.
     pub fn wait_states(&self, hclk: u32) -> (u8, u8) {
         // todo: 280 Mhz variants.
-        #[cfg(not(feature = "h735"))]
+        #[cfg(not(feature = "h7_2or3_x"))]
         match self {
             #[cfg(not(feature = "h7b3"))]
             Self::VOS0 => match hclk {
@@ -362,7 +362,7 @@ impl VosRange {
             },
         }
 
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h7_2or3_x")]
         match self {
             Self::VOS0 => match hclk {
                 0..=70_000_000 => (0, 0b00),
@@ -442,7 +442,7 @@ pub struct Clocks {
     pub vos_range: VosRange,
     /// SAI1 and DFSDM1 kernel Aclk clock source selection
     pub sai1_src: SaiSrc,
-    #[cfg(not(feature = "h735"))]
+    #[cfg(not(feature = "h7_2or3_x"))]
     /// SAI2 and SAI3 kernel clock source selection
     pub sai23_src: SaiSrc,
     pub sai4a_src: SaiSrc,
@@ -490,7 +490,7 @@ impl Clocks {
         // changing the voltage scaling.
         match self.vos_range {
             // todo: Do we need this on H5?
-            #[cfg(not(any(feature = "h5", feature = "h7b3", feature = "h735")))]
+            #[cfg(not(any(feature = "h5", feature = "h7b3", feature = "h7_2or3_x")))]
             // Note:H735 etc have VOS0, but not oden; the RM doesn't list these steps.
             VosRange::VOS0 => {
                 let syscfg = unsafe { &(*SYSCFG::ptr()) };
@@ -666,7 +666,7 @@ impl Clocks {
         #[cfg(not(any(feature = "h7b3", feature = "h5")))]
         rcc.d2ccip1r().modify(|_, w| unsafe {
             w.sai1sel().bits(self.sai1_src as u8);
-            #[cfg(not(feature = "h735"))]
+            #[cfg(not(feature = "h7_2or3_x"))]
             w.sai23sel().bits(self.sai23_src as u8);
             w.spi123sel().bits(self.spi123_src as u8);
             w.spi45sel().bits(self.spi45_src as u8);
@@ -1200,13 +1200,14 @@ impl Clocks {
     }
 
     pub fn validate_speeds(&self) -> Result<()> {
-        cfg_if! {
-            if #[cfg(feature = "h735")] {
-                let max_sysclk = 480_000_000;
-            } else {
-                let max_sysclk = 550_000_000;
-            }
-        }
+        // cfg_if! {
+        //     if #[cfg(feature = "h735")] {
+        //         let max_sysclk = 480_000_000;
+        //     } else {
+        let max_sysclk = 550_000_000;
+        //     }
+        // }
+
         // #[cfg(feature = "h743")]
         let max_hclk = 240_000_000;
         // #[cfg(feature = "h743")]
@@ -1330,7 +1331,7 @@ impl Default for Clocks {
             // in the `full_speed` method.
             vos_range: VosRange::VOS1,
             sai1_src: SaiSrc::Pll1Q,
-            #[cfg(not(feature = "h735"))]
+            #[cfg(not(feature = "h7_2or3_x"))]
             sai23_src: SaiSrc::Pll1Q,
             sai4a_src: SaiSrc::Pll1Q,
             sai4b_src: SaiSrc::Pll1Q,
@@ -1357,7 +1358,7 @@ impl Clocks {
         // todo: The change is
         //
         cfg_if! {
-            if #[cfg(feature = "h735")] {
+            if #[cfg(feature = "h7_2or3_x")] {
                 // let flash_regs = unsafe { &(*pac::FLASH::ptr()) };
 
                 // To modify user option bytes, follow the sequence below:

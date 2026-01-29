@@ -298,14 +298,14 @@ cfg_if! {
             }
         }
 
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h7_2or3_x")]
         impl BaudPeriph for pac::UART9 {
             fn baud(clock_cfg: &Clocks) -> u32 {
                 clock_cfg.apb2()
             }
         }
 
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h7_2or3_x")]
         impl BaudPeriph for pac::USART10 {
             fn baud(clock_cfg: &Clocks) -> u32 {
                 clock_cfg.apb2()
@@ -714,7 +714,7 @@ impl RccPeriph for pac::SAI1 {
     }
 }
 
-#[cfg(all(feature = "h7", not(feature = "h735")))]
+#[cfg(all(feature = "h7", not(feature = "h7_2or3_x")))]
 impl RccPeriph for pac::SAI2 {
     fn en_reset(rcc: &RegisterBlock) {
         rcc_en_reset!(apb2, sai2, rcc);
@@ -741,7 +741,7 @@ impl RccPeriph for pac::SAI2 {
     }
 }
 
-#[cfg(all(feature = "h7", not(feature = "h735")))]
+#[cfg(all(feature = "h7", not(feature = "h7_2or3_x")))]
 impl RccPeriph for pac::SAI3 {
     fn en_reset(rcc: &RegisterBlock) {
         rcc_en_reset!(apb2, sai3, rcc);
@@ -1013,14 +1013,14 @@ cfg_if! {
             }
         }
 
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h7_2or3_x")]
         impl RccPeriph for pac::UART9 {
             fn en_reset(rcc: &RegisterBlock) {
                 rcc_en_reset!(apb2, uart9, rcc);
             }
         }
 
-        #[cfg(feature = "h735")]
+        #[cfg(feature = "h7_2or3_x")]
         impl RccPeriph for pac::USART10 {
             fn en_reset(rcc: &RegisterBlock) {
                 rcc_en_reset!(apb2, usart10, rcc);

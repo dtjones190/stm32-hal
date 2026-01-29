@@ -1,8 +1,8 @@
 //! Indepdent watchdog
 
-#[cfg(not(any(feature = "h735", feature = "h747cm4", feature = "h747cm7")))]
+#[cfg(not(any(feature = "h7_2or3_x", feature = "h747cm4", feature = "h747cm7")))]
 use crate::pac::IWDG;
-#[cfg(any(feature = "h735", feature = "h747cm4", feature = "h747cm7"))]
+#[cfg(any(feature = "h7_2or3_x", feature = "h747cm4", feature = "h747cm7"))]
 use crate::pac::IWDG1 as IWDG;
 use crate::{
     error::{Error, Result},
